@@ -24,6 +24,7 @@ async function generateComment(studentData) {
         3. Đưa ra lời khuyên để cải thiện (nếu cần)
         4. Độ dài khoảng 2-3 câu
         5. Không sử dụng các câu từ mang nhiều cảm xúc, chủ yếu nhận xét và góp ý
+        6. Câu văn tự nhiên, không được thảo mai, khách sáo
         
         Chỉ trả về nội dung nhận xét, không cần thêm các từ ngữ khác.`;
 

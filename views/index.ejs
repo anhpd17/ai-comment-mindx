@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>anhpd17 - Auto Generate Comment for MindX Classes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .form-group label {
+            font-weight: bold;
+            color: #333;
+        }
+        input[type="url"],
+        input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .error {
+            color: #dc3545;
+            padding: 10px;
+            background-color: #f8d7da;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        tr:hover {
+            background-color: #f2f2f2;
+        }
+        .btn-generate {
+            background-color: #28a745;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+        .btn-generate:hover {
+            background-color: #218838;
+        }
+        .btn-apply {
+            background-color: #ffc107;
+            color: #000;
+            margin-bottom: 15px;
+            width: 100%;
+            display: none;
+        }
+        .btn-apply:hover {
+            background-color: #e0a800;
+        }
+        .comment-cell {
+            min-width: 200px;
+        }
+        .loading {
+            display: none;
+            color: #666;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .comment-status {
+            font-size: 14px;
+        }
+        .success {
+            color: #28a745;
+        }
+        .error-text {
+            color: #dc3545;
+        }
+        .generate-section {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>anhpd17 - Auto Generate Comment for MindX Classes</h1>
+        <form action="/submit" method="POST">
+            <div class="form-group">
+                <label for="url">Google Sheet URL (Mở quyền sửa cho mọi người):</label>
+                <input type="url" id="url" name="url" placeholder="Nhập link file nhận xét" required value="<%= url %>">
+            </div>
+            <div class="form-group">
+                <label for="sheetName">Sheet Name:</label>
+                <input type="text" id="sheetName" name="sheetName" placeholder="Tên sheet cần nhận xét (Viết chính xác như trong file)" required value="<%= locals.sheetName || '' %>">
+            </div>
+            <button type="submit">Lấy dữ liệu</button>
+        </form>
+        
+        <% if (locals.error) { %>
+            <div class="error">
+                <p><strong>Error:</strong> <%= error %></p>
+            </div>
+        <% } %>
+
+        <% if (locals.sheetData && locals.headers) { %>
+            <div class="result">
+                <div class="generate-section">
+                    <button 
+                        class="btn-generate"
+                        onclick="generateAllComments()"
+                        id="btn-generate-all"
+                    >
+                        Tự động viết nhận xét
+                    </button>
+                    <div class="loading" id="loading-all">Đang tạo nhận xét...</div>
+                    <button 
+                        class="btn-apply"
+                        onclick="applyComments()"
+                        id="btn-apply"
+                        disabled
+                    >
+                        Áp dụng nhận xét vào file
+                    </button>
+                </div>
+                
+                <h3>Sheet Data:</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <% headers.forEach(header => { %>
+                                <th><%= header %></th>
+                            <% }); %>
+                            <th>Nhận xét tự động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% sheetData.forEach((row, index) => { %>
+                            <tr>
+                                <% headers.forEach(header => { %>
+                                    <td><%= row[header] %></td>
+                                <% }); %>
+                                <td class="comment-cell" id="comment-<%= index %>">
+                                    <!-- Generated comment will appear here -->
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        <% } %>
+    </div>
+
+    <script>
+        let generatedComments = [];
+        const url = '<%= url %>';
+        const sheetName = '<%= locals.sheetName %>';
+
+        async function generateAllComments() {
+            const btn = document.getElementById('btn-generate-all');
+            const btnApply = document.getElementById('btn-apply');
+            const loading = document.getElementById('loading-all');
+            const rows = <%- JSON.stringify(locals.sheetData || []) %>;
+            
+            try {
+                // Disable button and show loading
+                btn.disabled = true;
+                loading.style.display = 'block';
+                generatedComments = [];
+                
+                // Generate comments for all rows
+                for (let i = 0; i < rows.length; i++) {
+                    const commentCell = document.getElementById(`comment-${i}`);
+                    commentCell.innerHTML = '<div class="comment-status">Đang viết...</div>';
+                    
+                    try {
+                        const response = await fetch('/generate-comment', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ rowData: rows[i] })
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            const comment = result.comment;
+                            generatedComments.push(comment);
+                            commentCell.innerHTML = `
+                                <div class="comment-status success">${comment}</div>
+                            `;
+                        } else {
+                            commentCell.innerHTML = `
+                                <div class="comment-status error-text">Lỗi: ${result.error}</div>
+                            `;
+                        }
+                    } catch (error) {
+                        commentCell.innerHTML = `
+                            <div class="comment-status error-text">Lỗi khi tạo nhận xét</div>
+                        `;
+                    }
+                }
+
+                // Show and enable Apply button if we have generated comments
+                if (generatedComments.length > 0) {
+                    btnApply.style.display = 'block';
+                    btnApply.disabled = false;
+                }
+            } catch (error) {
+                console.error('Lỗi khi tạo nhận xét:', error);
+            } finally {
+                // Re-enable button and hide loading
+                btn.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+
+        async function applyComments() {
+            const btnApply = document.getElementById('btn-apply');
+            btnApply.disabled = true;
+            
+            try {
+                const response = await fetch('/apply-comments', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        url,
+                        sheetName,
+                        comments: generatedComments
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Đã cập nhật nhận xét vào sheet thành công!');
+                } else {
+                    alert('Lỗi khi cập nhật nhận xét: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Lỗi khi cập nhật nhận xét:', error);
+                alert('Lỗi khi cập nhật nhận xét vào sheet');
+            } finally {
+                btnApply.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html> 

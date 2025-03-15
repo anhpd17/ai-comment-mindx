@@ -19,12 +19,14 @@ async function generateComment(studentData) {
         Nhận xét cũ: ${oldComment || 'Học tập tốt, thái độ tốt, cần phát huy'}
         
         Yêu cầu:
-        1. Nhận xét cụ thể dựa trên điểm số, nếu điểm BTVN không có giá trị thì bỏ qua không nhận xét bài tập
-        2. Nếu có nhận xét cũ, hãy tham khảo để đảm bảo tính liên tục trong việc theo dõi
-        3. Đưa ra lời khuyên để cải thiện (nếu cần)
-        4. Độ dài khoảng 2-3 câu
-        5. Không sử dụng các câu từ mang nhiều cảm xúc, chủ yếu nhận xét và góp ý
-        6. Câu văn tự nhiên, không được thảo mai, khách sáo
+        1. Nếu điểm BTVN bị để trống thì bỏ qua không nhận xét bài tập
+        2. Nếu điểm BTVN bằng 0 thì nhận xét là "Cần bổ sung bài tập đầy đủ"
+        3. Nếu điểm BTVN lớn hơn 0 và < 8 thì nhận xét là "Cần chú ý làm bài tập cẩn thận hơn"
+        4. Nếu có nhận xét cũ, hãy tham khảo để đảm bảo tính liên tục trong việc theo dõi
+        5. Đưa ra lời khuyên để cải thiện (nếu cần)
+        6. Độ dài khoảng 2-3 câu
+        7. Không sử dụng các câu từ mang nhiều cảm xúc, chủ yếu nhận xét và góp ý
+        8. Câu văn tự nhiên, không được thảo mai, khách sáo
         
         Chỉ trả về nội dung nhận xét, không cần thêm các từ ngữ khác.`;
 

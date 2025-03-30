@@ -8,26 +8,28 @@ if (!process.env.GEMINI_API_KEY) {
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 async function generateComment(studentData) {
+    console.log(studentData);
+    
     try {
-        const { 'Tên học viên': studentName, 'Nhận xét về buổi học': oldComment, 'BTVN': homeworkScore } = studentData;
-        console.log(studentName, oldComment, homeworkScore);
+        // Build student information string from all available columns
+        const studentInfo = Object.entries(studentData)
+            .map(([key, value]) => {
+                if(key.toLowerCase().includes('Nhận xét') && value.trim() === '') {
+                    return `Nhận xét buổi học: Học tốt, thái độ tốt, cần phát huy`
+                }
+                return `${key}: ${value || 'Không có thông tin'}`
+            })
+            .join('\n        ');
         
         const prompt = `Hãy viết một đoạn nhận xét ngắn gọn, chuyên nghiệp và có tính khích lệ cho học sinh dựa trên thông tin sau:
         
-        Tên học sinh: ${studentName}
-        Điểm BTVN: ${homeworkScore}
-        Nhận xét cũ: ${oldComment || 'Học tập tốt, thái độ tốt, cần phát huy'}
+        ${studentInfo}
         
         Yêu cầu:
-        1. Nếu điểm BTVN bị để trống thì bỏ qua không nhận xét bài tập
-        2. Nếu điểm BTVN bằng 0 thì nhận xét là "Cần bổ sung bài tập đầy đủ"
-        3. Nếu điểm BTVN lớn hơn 0 và < 8 thì nhận xét là "Cần chú ý làm bài tập cẩn thận hơn"
-        4. Nếu có nhận xét cũ, hãy tham khảo để đảm bảo tính liên tục trong việc theo dõi
-        5. Đưa ra lời khuyên để cải thiện (nếu cần)
-        6. Độ dài khoảng 2-3 câu
-        7. Không sử dụng các câu từ mang nhiều cảm xúc, chủ yếu nhận xét và góp ý
-        8. Câu văn tự nhiên, không được thảo mai, khách sáo
-        
+        1. Nếu có nhận xét cũ (trong trường "Nhận xét về buổi học" nếu có), hãy tham khảo để đảm bảo tính liên tục trong việc theo dõi
+        2. Đưa ra lời khuyên để cải thiện (nếu cần)
+        3. Độ dài khoảng 2-3 câu
+        4. Câu văn tự nhiên, không được thảo mai, khách sáo
         Chỉ trả về nội dung nhận xét, không cần thêm các từ ngữ khác.`;
 
         // Get the generative model

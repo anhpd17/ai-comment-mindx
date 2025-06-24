@@ -1,431 +1,520 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>anhpd17 - Auto Generate Comment for MindX Classes</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        :root {
-            --primary: #7C3AED;
-            --primary-hover: #6D28D9;
-            --background: #111827;
-            --surface: #1F2937;
-            --text: #F9FAFB;
-            --text-secondary: #9CA3AF;
-            --border: #374151;
-            --success: #059669;
-            --error: #DC2626;
-            --warning: #D97706;
-        }
+      :root {
+        --primary: #7c3aed;
+        --primary-hover: #6d28d9;
+        --background: #111827;
+        --surface: #1f2937;
+        --text: #f9fafb;
+        --text-secondary: #9ca3af;
+        --border: #374151;
+        --success: #059669;
+        --error: #dc2626;
+        --warning: #d97706;
+      }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+      }
 
+      body {
+        font-family: "Inter", sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: var(--background);
+        color: var(--text);
+        line-height: 1.6;
+      }
+
+      .container {
+        background-color: var(--surface);
+        padding: 2rem;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        animation: fadeIn 0.5s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      h1 {
+        font-size: 1.875rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        color: var(--text);
+        text-align: center;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .form-group label {
+        font-weight: 600;
+        color: var(--text);
+        font-size: 0.875rem;
+      }
+
+      input[type="url"],
+      input[type="text"] {
+        padding: 0.75rem 1rem;
+        border: 2px solid var(--border);
+        border-radius: 8px;
+        font-size: 1rem;
+        background-color: var(--background);
+        color: var(--text);
+        transition: all 0.2s ease;
+      }
+
+      input[type="url"]:focus,
+      input[type="text"]:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+      }
+
+      button {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+
+      button:not(:disabled) {
+        background-color: var(--primary);
+        color: white;
+      }
+
+      button:not(:disabled):hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-1px);
+      }
+
+      button:disabled {
+        background-color: var(--border);
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+
+      .result {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        animation: slideUp 0.5s ease;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .error {
+        color: var(--error);
+        padding: 1rem;
+        background-color: rgba(220, 38, 38, 0.1);
+        border-radius: 8px;
+        margin-top: 1rem;
+        border: 1px solid var(--error);
+        animation: shake 0.5s ease;
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-5px);
+        }
+        75% {
+          transform: translateX(5px);
+        }
+      }
+
+      table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-top: 1.5rem;
+      }
+
+      th,
+      td {
+        border: 1px solid var(--border);
+        padding: 1rem;
+        text-align: left;
+      }
+
+      th {
+        background-color: rgba(124, 58, 237, 0.1);
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      tr:nth-child(even) {
+        background-color: rgba(31, 41, 55, 0.5);
+      }
+
+      tr:hover {
+        background-color: rgba(124, 58, 237, 0.05);
+      }
+
+      .btn-generate {
+        background-color: var(--success) !important;
+        margin-bottom: 1rem;
+        width: 100%;
+      }
+
+      .btn-generate:hover {
+        background-color: #047857;
+      }
+
+      .btn-apply {
+        background-color: var(--warning) !important;
+        color: white;
+        margin-bottom: 1rem;
+        width: 100%;
+        display: none;
+      }
+
+      .btn-apply:hover {
+        background-color: #b45309;
+      }
+
+      .comment-cell {
+        min-width: 250px;
+      }
+
+      .loading {
+        display: none;
+        color: var(--text-secondary);
+        text-align: center;
+        margin: 1rem 0;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          opacity: 0.6;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0.6;
+        }
+      }
+
+      .comment-status {
+        font-size: 0.875rem;
+        padding: 0.5rem;
+        border-radius: 6px;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .success {
+        color: var(--success);
+        background-color: rgba(5, 150, 105, 0.1);
+      }
+
+      .error-text {
+        color: var(--error);
+        background-color: rgba(220, 38, 38, 0.1);
+      }
+
+      .generate-section {
+        margin-top: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
         body {
-            font-family: 'Inter', sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: var(--background);
-            color: var(--text);
-            line-height: 1.6;
+          padding: 1rem;
         }
 
         .container {
-            background-color: var(--surface);
-            padding: 2rem;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h1 {
-            font-size: 1.875rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            color: var(--text);
-            text-align: center;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .form-group label {
-            font-weight: 600;
-            color: var(--text);
-            font-size: 0.875rem;
-        }
-
-        input[type="url"],
-        input[type="text"] {
-            padding: 0.75rem 1rem;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            font-size: 1rem;
-            background-color: var(--background);
-            color: var(--text);
-            transition: all 0.2s ease;
-        }
-
-        input[type="url"]:focus,
-        input[type="text"]:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
-        }
-
-        button {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        button:not(:disabled) {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        button:not(:disabled):hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-1px);
-        }
-
-        button:disabled {
-            background-color: var(--border);
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        .result {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            animation: slideUp 0.5s ease;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .error {
-            color: var(--error);
-            padding: 1rem;
-            background-color: rgba(220, 38, 38, 0.1);
-            border-radius: 8px;
-            margin-top: 1rem;
-            border: 1px solid var(--error);
-            animation: shake 0.5s ease;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+          padding: 1rem;
         }
 
         table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-top: 1.5rem;
+          display: block;
+          overflow-x: auto;
+          white-space: nowrap;
         }
-
-        th, td {
-            border: 1px solid var(--border);
-            padding: 1rem;
-            text-align: left;
-        }
-
-        th {
-            background-color: rgba(124, 58, 237, 0.1);
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        tr:nth-child(even) {
-            background-color: rgba(31, 41, 55, 0.5);
-        }
-
-        tr:hover {
-            background-color: rgba(124, 58, 237, 0.05);
-        }
-
-        .btn-generate {
-            background-color: var(--success) !important;
-            margin-bottom: 1rem;
-            width: 100%;
-        }
-
-        .btn-generate:hover {
-            background-color: #047857;
-        }
-
-        .btn-apply {
-            background-color: var(--warning) !important;
-            color: white;
-            margin-bottom: 1rem;
-            width: 100%;
-            display: none;
-        }
-
-        .btn-apply:hover {
-            background-color: #B45309;
-        }
-
-        .comment-cell {
-            min-width: 250px;
-        }
-
-        .loading {
-            display: none;
-            color: var(--text-secondary);
-            text-align: center;
-            margin: 1rem 0;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
-        }
-
-        .comment-status {
-            font-size: 0.875rem;
-            padding: 0.5rem;
-            border-radius: 6px;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .success {
-            color: var(--success);
-            background-color: rgba(5, 150, 105, 0.1);
-        }
-
-        .error-text {
-            color: var(--error);
-            background-color: rgba(220, 38, 38, 0.1);
-        }
-
-        .generate-section {
-            margin-top: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            body {
-                padding: 1rem;
-            }
-
-            .container {
-                padding: 1rem;
-            }
-
-            table {
-                display: block;
-                overflow-x: auto;
-                white-space: nowrap;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <h1>anhpd17 - Auto Generate Comment for MindX Classes</h1>
-        <form action="/submit" method="POST">
-            <div class="form-group">
-                <label for="url">Google Sheet URL (Mở quyền xem):</label>
-                <input type="url" id="url" name="url" placeholder="Nhập link file nhận xét" required value="<%= url %>">
-            </div>
-            <div class="form-group">
-                <label for="sheetName">Sheet Name:</label>
-                <input type="text" id="sheetName" name="sheetName" placeholder="Tên sheet cần nhận xét (Viết chính xác như trong file)" required value="<%= locals.sheetName || '' %>">
-            </div>
-            <button type="submit">Lấy dữ liệu</button>
-        </form>
-        
-        <% if (locals.error) { %>
-            <div class="error">
-                <p><strong>Error:</strong> <%= error %></p>
-            </div>
-        <% } %>
+      <h1>anhpd17 - Auto Generate Comment for MindX Classes</h1>
+      <form action="/submit" method="POST">
+        <div class="form-group">
+          <label for="url">Google Sheet URL (Mở quyền xem):</label>
+          <input
+            type="url"
+            id="url"
+            name="url"
+            placeholder="Nhập link file nhận xét"
+            required
+            value="<%= url %>"
+          />
+        </div>
+        <div class="form-group">
+          <label for="sheetName">Sheet Name:</label>
+          <input
+            type="text"
+            id="sheetName"
+            name="sheetName"
+            placeholder="Tên sheet cần nhận xét (Viết chính xác như trong file)"
+            required
+            value="<%= locals.sheetName || '' %>"
+          />
+        </div>
+        <button type="submit">Lấy dữ liệu</button>
+      </form>
 
-        <% if (locals.sheetData && locals.headers) { %>
-            <div class="result">
-                <div class="generate-section">
-                    <button 
-                        class="btn-generate"
-                        onclick="generateAllComments()"
-                        id="btn-generate-all"
-                    >
-                        Tự động viết nhận xét
-                    </button>
-                    <div class="loading" id="loading-all">Đang tạo nhận xét...</div>
-                    <button 
-                        class="btn-apply"
-                        onclick="applyComments()"
-                        id="btn-apply"
-                        disabled
-                    >
-                        Áp dụng nhận xét vào file (Cần mở quyền sửa cho mọi người)
-                    </button>
-                </div>
-                
-                <h3>Sheet Data:</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <% headers.forEach(header => { %>
-                                <th><%= header %></th>
-                            <% }); %>
-                            <th>Nhận xét tự động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% sheetData.forEach((row, index) => { %>
-                            <tr>
-                                <% headers.forEach(header => { %>
-                                    <td><%= row[header] %></td>
-                                <% }); %>
-                                <td class="comment-cell" id="comment-<%= index %>">
-                                    <!-- Generated comment will appear here -->
-                                </td>
-                            </tr>
-                        <% }); %>
-                    </tbody>
-                </table>
-            </div>
-        <% } %>
+      <% if (locals.error) { %>
+      <div class="error">
+        <p><strong>Error:</strong> <%= error %></p>
+      </div>
+      <% } %> <% if (locals.sheetData && locals.headers) { %>
+      <div class="result">
+        <div class="generate-section">
+          <button
+            class="btn-generate"
+            onclick="generateAllComments()"
+            id="btn-generate-all"
+          >
+            Tự động viết nhận xét
+          </button>
+          <div class="loading" id="loading-all">Đang tạo nhận xét...</div>
+          <button
+            class="btn-apply"
+            onclick="applyComments()"
+            id="btn-apply"
+            disabled
+          >
+            Áp dụng nhận xét vào file (Cần mở quyền sửa cho mọi người)
+          </button>
+        </div>
+        <!-- Button và hiển thị tin nhắn mẫu -->
+        <div style="margin-bottom: 1rem">
+          <button
+            type="button"
+            id="btn-show-sample"
+            style="
+              width: 100%;
+              margin-top: 24px;
+              background: var(--primary);
+              color: white;
+              padding: 0.5rem 1rem;
+              border-radius: 8px;
+              border: none;
+              font-weight: 600;
+              cursor: pointer;
+            "
+            onclick="showSampleMessage()"
+          >
+            Tạo tin nhắn mẫu
+          </button>
+          <div
+            id="sample-message"
+            style="
+              margin-top: 1rem;
+              display: none;
+              background: #232946;
+              color: #fff;
+              padding: 1rem;
+              border-radius: 8px;
+            "
+          ></div>
+        </div>
+        <h3>Sheet Data:</h3>
+        <table>
+          <thead>
+            <tr>
+              <% headers.forEach(header => { %>
+              <th><%= header %></th>
+              <% }); %>
+              <th>Nhận xét tự động</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% sheetData.forEach((row, index) => { %>
+            <tr>
+              <% headers.forEach(header => { %>
+              <td><%= row[header] %></td>
+              <% }); %>
+              <td class="comment-cell" id="comment-<%= index %>">
+                <!-- Generated comment will appear here -->
+              </td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+      <% } %>
     </div>
 
     <script>
-        let generatedComments = [];
-        const url = '<%= url %>';
-        const sheetName = '<%= locals.sheetName %>';
+      let generatedComments = [];
+      const url = '<%= url %>';
+      const sheetName = '<%= locals.sheetName %>';
 
-        async function generateAllComments() {
-            const btn = document.getElementById('btn-generate-all');
-            const btnApply = document.getElementById('btn-apply');
-            const loading = document.getElementById('loading-all');
-            const rows = <%- JSON.stringify(locals.sheetData || []) %>;
-            
-            try {
-                // Disable button and show loading
-                btn.disabled = true;
-                loading.style.display = 'block';
-                generatedComments = [];
-                
-                // Generate comments for all rows
-                for (let i = 0; i < rows.length; i++) {
-                    const commentCell = document.getElementById(`comment-${i}`);
-                    commentCell.innerHTML = '<div class="comment-status">Đang viết...</div>';
-                    
-                    try {
-                        const response = await fetch('/generate-comment', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ rowData: rows[i] })
-                        });
-                        
-                        const result = await response.json();
-                        
-                        if (result.success) {
-                            const comment = result.comment;
-                            generatedComments.push(comment);
-                            commentCell.innerHTML = `
-                                <div class="comment-status success">${comment}</div>
-                            `;
-                        } else {
-                            commentCell.innerHTML = `
-                                <div class="comment-status error-text">Lỗi: ${result.error}</div>
-                            `;
-                        }
-                    } catch (error) {
-                        commentCell.innerHTML = `
-                            <div class="comment-status error-text">Lỗi khi tạo nhận xét</div>
-                        `;
-                    }
-                }
+      async function generateAllComments() {
+          const btn = document.getElementById('btn-generate-all');
+          const btnApply = document.getElementById('btn-apply');
+          const loading = document.getElementById('loading-all');
+          const rows = <%- JSON.stringify(locals.sheetData || []) %>;
 
-                // Show and enable Apply button if we have generated comments
-                if (generatedComments.length > 0) {
-                    btnApply.style.display = 'block';
-                    btnApply.disabled = false;
-                }
-            } catch (error) {
-                console.error('Lỗi khi tạo nhận xét:', error);
-            } finally {
-                // Re-enable button and hide loading
-                btn.disabled = false;
-                loading.style.display = 'none';
-            }
-        }
+          try {
+              // Disable button and show loading
+              btn.disabled = true;
+              loading.style.display = 'block';
+              generatedComments = [];
 
-        async function applyComments() {
-            const btnApply = document.getElementById('btn-apply');
-            btnApply.disabled = true;
-            
-            try {
-                const response = await fetch('/apply-comments', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        url,
-                        sheetName,
-                        comments: generatedComments
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert('Đã cập nhật nhận xét vào sheet thành công!');
-                } else {
-                    alert('Lỗi khi cập nhật nhận xét: ' + result.error);
-                }
-            } catch (error) {
-                console.error('Lỗi khi cập nhật nhận xét:', error);
-                alert('Lỗi khi cập nhật nhận xét vào sheet');
-            } finally {
-                btnApply.disabled = false;
-            }
+              // Generate comments for all rows
+              for (let i = 0; i < rows.length; i++) {
+                  const commentCell = document.getElementById(`comment-${i}`);
+                  commentCell.innerHTML = '<div class="comment-status">Đang viết...</div>';
+
+                  try {
+                      const response = await fetch('/generate-comment', {
+                          method: 'POST',
+                          headers: {
+                              'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({ rowData: rows[i] })
+                      });
+
+                      const result = await response.json();
+
+                      if (result.success) {
+                          const comment = result.comment;
+                          generatedComments.push(comment);
+                          commentCell.innerHTML = `
+                              <div class="comment-status success">${comment}</div>
+                          `;
+                      } else {
+                          commentCell.innerHTML = `
+                              <div class="comment-status error-text">Lỗi: ${result.error}</div>
+                          `;
+                      }
+                  } catch (error) {
+                      commentCell.innerHTML = `
+                          <div class="comment-status error-text">Lỗi khi tạo nhận xét</div>
+                      `;
+                  }
+              }
+
+              // Show and enable Apply button if we have generated comments
+              if (generatedComments.length > 0) {
+                  btnApply.style.display = 'block';
+                  btnApply.disabled = false;
+              }
+          } catch (error) {
+              console.error('Lỗi khi tạo nhận xét:', error);
+          } finally {
+              // Re-enable button and hide loading
+              btn.disabled = false;
+              loading.style.display = 'none';
+          }
+      }
+
+      async function applyComments() {
+          const btnApply = document.getElementById('btn-apply');
+          btnApply.disabled = true;
+
+          try {
+              const response = await fetch('/apply-comments', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                      url,
+                      sheetName,
+                      comments: generatedComments
+                  })
+              });
+
+              const result = await response.json();
+
+              if (result.success) {
+                  alert('Đã cập nhật nhận xét vào sheet thành công!');
+              } else {
+                  alert('Lỗi khi cập nhật nhận xét: ' + result.error);
+              }
+          } catch (error) {
+              console.error('Lỗi khi cập nhật nhận xét:', error);
+              alert('Lỗi khi cập nhật nhận xét vào sheet');
+          } finally {
+              btnApply.disabled = false;
+          }
+      }
+      function showSampleMessage() {
+            const lessonIndex = "<%= lessonIndex || '' %>";
+            const lessonTitle = "<%= lessonTitle || '' %>";
+            const message = `
+                <div>Kính gửi Quý phụ huynh,</div>
+                <div style="font-weight: 500; color: rgb(219, 52, 46);"> TỔNG KẾT NỘI DUNG BUỔI HỌC ${lessonIndex} - ${lessonTitle} </div>
+                <div style="font-weight: 500;"> NX buổi học &amp; nhiệm vụ về nhà: </div>
+                <div style="font-style: italic; text-decoration: underline; text-decoration-skip-ink: none; cursor: pointer;">
+                    ${url}
+                </div>
+                <div> Cảm ơn Quý phụ huynh đã dành thời gian để đọc tình hình học tập của các bạn, chúc anh chị buổi sáng vui vẻ ạ! @All </div>
+            `;
+            const div = document.getElementById('sample-message');
+            div.style.display = 'block';
+            div.innerHTML = message;
         }
     </script>
-</body>
-</html> 
+  </body>
+</html>

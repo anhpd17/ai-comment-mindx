@@ -324,7 +324,9 @@
       <div class="error">
         <p><strong>Error:</strong> <%= error %></p>
       </div>
-      <% } %> <% if (locals.sheetData && locals.headers) { %>
+      <% } %> <% if (typeof lessonIndex === 'undefined') { var lessonIndex =
+      null; } %> <% if (typeof lessonTitle === 'undefined') { var lessonTitle =
+      null; } %> <% if (locals.sheetData && locals.headers) { %>
       <div class="result">
         <div class="generate-section">
           <button
@@ -502,6 +504,12 @@
       function showSampleMessage() {
             const lessonIndex = "<%= lessonIndex || '' %>";
             const lessonTitle = "<%= lessonTitle || '' %>";
+            let currentHour = parseInt(new Date().toLocaleString('en-US', {
+              timeZone: 'Asia/Ho_Chi_Minh',
+              hour: '2-digit',
+              hour12: false
+            }), 10);
+            let periodDay = currentHour < 12 ? 'sáng' : currentHour < 18 ? 'chiều' : 'tối';
             const message = `
                 <div>Kính gửi Quý phụ huynh,</div>
                 <div style="font-weight: 500; color: rgb(219, 52, 46);"> TỔNG KẾT NỘI DUNG BUỔI HỌC ${lessonIndex} - ${lessonTitle} </div>
@@ -509,7 +517,7 @@
                 <div style="font-style: italic; text-decoration: underline; text-decoration-skip-ink: none; cursor: pointer;">
                     ${url}
                 </div>
-                <div> Cảm ơn Quý phụ huynh đã dành thời gian để đọc tình hình học tập của các bạn, chúc anh chị buổi sáng vui vẻ ạ! @All </div>
+                <div> Cảm ơn Quý phụ huynh đã dành thời gian để đọc tình hình học tập của các bạn, chúc anh chị buổi ${periodDay} vui vẻ ạ! @All </div>
             `;
             const div = document.getElementById('sample-message');
             div.style.display = 'block';
